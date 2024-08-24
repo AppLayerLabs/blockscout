@@ -39,6 +39,29 @@ defmodule Explorer.Token.BalanceReader do
     }
   ]
 
+  defp filter_balance_requests(params_list) do
+    if Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?) do
+      json_rpc_named_arguments = Application.get_env(:explorer, :json_rpc_named_arguments)
+
+      {:ok, max_block_number} = EthereumJSONRPC.fetch_block_number_by_tag("latest", json_rpc_named_arguments)
+      window = Application.get_env(:ethereum_jsonrpc, :archive_balances_window)
+
+      params_list
+      |> Enum.filter(fn
+        %{block_quantity: "latest"} ->
+          true
+
+        %{block_quantity: block_quantity} ->
+          EthereumJSONRPC.quantity_to_integer(block_quantity) > max_block_number - window
+
+        _ ->
+          false
+      end)
+    else
+      params_list
+    end
+  end
+
   @spec get_balances_of([
           %{
             token_contract_address_hash: String.t(),
@@ -49,6 +72,7 @@ defmodule Explorer.Token.BalanceReader do
         ]) :: [{:ok, non_neg_integer()} | {:error, String.t()}]
   def get_balances_of(token_balance_requests) do
     token_balance_requests
+    |> filter_balance_requests()
     |> Enum.map(&format_balance_request/1)
     |> Reader.query_contracts(@balance_function_abi)
     |> Enum.map(&format_balance_result/1)
