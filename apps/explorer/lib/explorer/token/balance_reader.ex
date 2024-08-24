@@ -105,7 +105,8 @@ defmodule Explorer.Token.BalanceReader do
       contract_address: token_contract_address_hash,
       method_id: "70a08231",
       args: [address_hash],
-      block_number: block_number
+      # (TODO DO NOT MERGE): make it configurable block_number: block_number,
+      block_number: "latest"
     }
   end
 
