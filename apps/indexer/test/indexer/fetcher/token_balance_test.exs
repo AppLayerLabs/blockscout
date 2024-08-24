@@ -272,6 +272,50 @@ defmodule Indexer.Fetcher.TokenBalanceTest do
 
       assert Repo.all(Address.TokenBalance) == []
     end
+
+    test "uses latest param when a token defines it only supports latest" do
+      %Address.TokenBalance{
+        address_hash: %Hash{bytes: address_hash_bytes} = address_hash,
+        token_contract_address_hash: %Hash{bytes: token_contract_address_hash_bytes},
+        block_number: block_number
+      } = insert(:token_balance, value_fetched_at: nil, value: nil)
+
+      expect(
+        EthereumJSONRPC.Mox,
+        :json_rpc,
+        fn [%{id: id, method: "eth_call", params: [%{data: _, to: _}, v]}], _options ->
+          if v == "latest" do
+            {:ok,
+             [
+               %{
+                 id: id,
+                 jsonrpc: "2.0",
+                 result: "0x00000000000000000000000000000000000000000000d3c21bcecceda1000000"
+               }
+             ]}
+          else
+            {:ok,
+             [
+               %{
+                 id: id,
+                 jsonrpc: "2.0",
+                 error: %{code: -32601, message: "Only latest block is supported"}
+               }
+             ]}
+          end
+        end
+      )
+
+      assert TokenBalance.run(
+               [{address_hash_bytes, token_contract_address_hash_bytes, block_number, "ERC-20", nil, 0}],
+               nil
+             ) == :ok
+
+      token_balance_updated = Repo.get_by(Address.TokenBalance, address_hash: address_hash)
+
+      assert token_balance_updated.value == Decimal.new(1_000_000_000_000_000_000_000_000)
+      assert token_balance_updated.value_fetched_at != nil
+    end
   end
 
   describe "import_token_balances/1" do
