@@ -1870,9 +1870,13 @@ defmodule Explorer.Chain do
         ) :: {:ok, accumulator}
         when accumulator: term()
   def stream_unfetched_token_balances(initial, reducer, limited? \\ false) when is_function(reducer, 2) do
-    TokenBalance.unfetched_token_balances()
-    |> add_token_balances_fetcher_limit(limited?)
-    |> Repo.stream_reduce(initial, reducer)
+    if not Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?, false) do
+      TokenBalance.unfetched_token_balances()
+      |> add_token_balances_fetcher_limit(limited?)
+      |> Repo.stream_reduce(initial, reducer)
+    else
+      {:ok, {0, []}}
+    end
   end
 
   @doc """

@@ -4,6 +4,7 @@ defmodule Explorer.Token.BalanceReader do
   """
 
   alias Explorer.SmartContract.Reader
+  require Logger
 
   @balance_function_abi [
     %{
@@ -55,6 +56,7 @@ defmodule Explorer.Token.BalanceReader do
           EthereumJSONRPC.quantity_to_integer(block_quantity) > max_block_number - window
 
         _ ->
+          Logger.warn("requesting token balance request data when it shouldnt")
           false
       end)
     else
