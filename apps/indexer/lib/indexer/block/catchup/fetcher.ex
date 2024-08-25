@@ -135,7 +135,11 @@ defmodule Indexer.Block.Catchup.Fetcher do
     async_import_created_contract_codes(imported, realtime?)
     async_import_internal_transactions(imported, realtime?)
     async_import_tokens(imported, realtime?)
-    async_import_token_balances(imported, realtime?)
+
+    if not Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?, false) do
+      async_import_token_balances(imported, realtime?)
+    end
+
     async_import_uncles(imported, realtime?)
     async_import_replaced_transactions(imported, realtime?)
     async_import_token_instances(imported)
