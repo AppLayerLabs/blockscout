@@ -283,26 +283,62 @@ defmodule Indexer.Fetcher.TokenBalanceTest do
       expect(
         EthereumJSONRPC.Mox,
         :json_rpc,
-        fn [%{id: id, method: "eth_call", params: [%{data: _, to: _}, v]}], _options ->
-          if v == "latest" do
+        fn
+          [%{id: id, params: ["latest", false], method: "eth_getBlockByNumber", jsonrpc: "2.0"}], _options ->
+            block_hash = block_hash()
+            miner_hash = address_hash()
+            miner_hash_data = to_string(miner_hash)
+
             {:ok,
              [
                %{
                  id: id,
                  jsonrpc: "2.0",
-                 result: "0x00000000000000000000000000000000000000000000d3c21bcecceda1000000"
+                 result: %{
+                   "hash" => to_string(block_hash),
+                   "number" => "0x0000000000000000000000000000000000000000000000000000000000111111",
+                   "difficulty" => "0x0",
+                   "gasLimit" => "0x0",
+                   "gasUsed" => "0x0",
+                   "extraData" => "0x0",
+                   "logsBloom" => "0x0",
+                   "miner" => miner_hash_data,
+                   "parentHash" =>
+                     block_hash()
+                     |> to_string(),
+                   "receiptsRoot" => "0x0",
+                   "size" => "0x0",
+                   "sha3Uncles" => "0x0",
+                   "stateRoot" => "0x0",
+                   "timestamp" => "0x0",
+                   "totalDifficulty" => "0x0",
+                   "transactions" => [],
+                   "transactionsRoot" => "0x0",
+                   "uncles" => []
+                 }
                }
              ]}
-          else
-            {:ok,
-             [
-               %{
-                 id: id,
-                 jsonrpc: "2.0",
-                 error: %{code: -32601, message: "Only latest block is supported"}
-               }
-             ]}
-          end
+
+          [%{id: id, method: "eth_call", params: [%{data: _, to: _}, v]}], _options ->
+            if v == "latest" do
+              {:ok,
+               [
+                 %{
+                   id: id,
+                   jsonrpc: "2.0",
+                   result: "0x00000000000000000000000000000000000000000000d3c21bcecceda1000000"
+                 }
+               ]}
+            else
+              {:ok,
+               [
+                 %{
+                   id: id,
+                   jsonrpc: "2.0",
+                   error: %{code: -32601, message: "Only latest block is supported"}
+                 }
+               ]}
+            end
         end
       )
 
@@ -313,8 +349,8 @@ defmodule Indexer.Fetcher.TokenBalanceTest do
 
       token_balance_updated = Repo.get_by(Address.TokenBalance, address_hash: address_hash)
 
-      assert token_balance_updated.value == Decimal.new(1_000_000_000_000_000_000_000_000)
-      assert token_balance_updated.value_fetched_at != nil
+      assert token_balance_updated.value == nil
+      assert token_balance_updated.value_fetched_at == nil
     end
   end
 
