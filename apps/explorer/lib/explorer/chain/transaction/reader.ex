@@ -80,8 +80,12 @@ defmodule Explorer.Chain.Transaction.Reader do
         select: ^fields
       )
 
-    query
-    |> add_fetcher_limit(limited?)
-    |> Repo.stream_reduce(initial, reducer)
+    if not Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?, false) do
+      query
+      |> add_fetcher_limit(limited?)
+      |> Repo.stream_reduce(initial, reducer)
+    else
+      {:ok, {0, []}}
+    end
   end
 end

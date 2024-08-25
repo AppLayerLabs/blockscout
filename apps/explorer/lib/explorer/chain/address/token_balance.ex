@@ -159,9 +159,13 @@ defmodule Explorer.Chain.Address.TokenBalance do
         ) :: {:ok, accumulator}
         when accumulator: term()
   def stream_unfetched_token_balances(initial, reducer, limited? \\ false) when is_function(reducer, 2) do
-    __MODULE__.unfetched_token_balances()
-    |> add_token_balances_fetcher_limit(limited?)
-    |> Repo.stream_reduce(initial, reducer)
+    if not Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?, false) do
+      __MODULE__.unfetched_token_balances()
+      |> add_token_balances_fetcher_limit(limited?)
+      |> Repo.stream_reduce(initial, reducer)
+    else
+      {:ok, {0, []}}
+    end
   end
 
   def add_token_balances_fetcher_limit(query, false), do: query
