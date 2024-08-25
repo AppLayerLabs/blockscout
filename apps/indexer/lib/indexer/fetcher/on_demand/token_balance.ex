@@ -47,6 +47,10 @@ defmodule Indexer.Fetcher.OnDemand.TokenBalance do
           non_neg_integer()
         ) :: :ok
   def trigger_historic_fetch(caller \\ nil, address_hash, contract_address_hash, token_type, token_id, block_number) do
+    if Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?) do
+      raise "should not start historical fetch when DISABLE_ARCHIVE_CALLS is true. this is a bug"
+    end
+
     if not __MODULE__.Supervisor.disabled?() and RateLimiter.check_rate(caller, :on_demand) == :allow do
       BufferedTask.buffer(
         __MODULE__,
