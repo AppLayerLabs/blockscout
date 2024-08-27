@@ -132,11 +132,11 @@ defmodule Indexer.Block.Catchup.Fetcher do
 
     async_import_block_rewards(block_reward_errors, realtime?)
     async_import_coin_balances(imported, options)
-    async_import_created_contract_codes(imported, realtime?)
     async_import_internal_transactions(imported, realtime?)
     async_import_tokens(imported, realtime?)
 
     if not Application.get_env(:ethereum_jsonrpc, :disable_archive_calls?, false) do
+      async_import_created_contract_codes(imported, realtime?)
       async_import_token_balances(imported, realtime?)
     end
 
