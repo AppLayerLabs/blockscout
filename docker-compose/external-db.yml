@@ -6,15 +6,6 @@ services:
       file: ./services/redis.yml
       service: redis-db
 
-  backend:
-    depends_on:
-      - redis-db
-    extends:
-      file: ./services/backend.yml
-      service: backend
-    environment:
-        ETHEREUM_JSONRPC_VARIANT: 'geth'
-
   visualizer:
     extends:
       file: ./services/visualizer.yml
@@ -26,11 +17,13 @@ services:
       service: sig-provider
 
   frontend:
-    depends_on:
-      - backend
     extends:
       file: ./services/frontend.yml
       service: frontend
+    ports:
+    - "3000:3000"
+    networks:
+      - frontend-network
 
   stats-db-init:
     extends:
@@ -44,27 +37,25 @@ services:
     extends:
       file: ./services/stats.yml
       service: stats-db
+    networks:
+      - frontend-network
 
   stats:
     depends_on:
       - stats-db
-      - backend
     extends:
       file: ./services/stats.yml
       service: stats
+    networks:
+      - frontend-network
 
   user-ops-indexer:
-    depends_on:
-      - backend
     extends:
       file: ./services/user-ops-indexer.yml
       service: user-ops-indexer
+    networks:
+      - frontend-network
 
-  proxy:
-    depends_on:
-      - backend
-      - frontend
-      - stats
-    extends:
-      file: ./services/nginx.yml
-      service: proxy
+networks:
+  frontend-network:
+    driver: bridge

@@ -13,6 +13,12 @@ services:
     ports:
       - 8083:8050
     
+  frontend:
+    extends:
+      file: ./services/frontend.yml
+      service: frontend
+    ports:
+    - "3000:3000"
 
   sc-verifier:
     extends:
@@ -46,12 +52,13 @@ services:
       file: ./services/user-ops-indexer.yml
       service: user-ops-indexer
 
-  proxy:
-    depends_on:
-      - visualizer
-      - stats
-    extends:
-      file: ./services/nginx.yml
-      service: proxy
-    volumes:
-      - "./proxy/microservices.conf.template:/etc/nginx/templates/default.conf.template"
+  # proxy:
+  #   depends_on:
+  #     - visualizer
+  #     - stats
+  #   extends:
+  #     file: ./services/nginx.yml
+  #     service: proxy
+  #   volumes:
+  #     - "./proxy/microservices.conf.template:/etc/nginx/templates/default.conf.template"
+      
