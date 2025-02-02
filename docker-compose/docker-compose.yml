@@ -101,3 +101,5 @@ services:
     extends:
       file: ./services/nginx.yml
       service: proxy
+    volumes:
+      - /etc/nginx/ssl:/etc/nginx/ssl:ro
