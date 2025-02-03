@@ -11,11 +11,8 @@ services:
         published: 8081
       - target: 8081
         published: 8082
-      - target: 443
-        published: 8443
     volumes:
       - "../proxy:/etc/nginx/templates"
-      - ./ssl:/etc/nginx/ssl:ro
     environment:
       BACK_PROXY_PASS: ${BACK_PROXY_PASS:-http://backend:4000}
       FRONT_PROXY_PASS: ${FRONT_PROXY_PASS:-http://frontend:3000}
