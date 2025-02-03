@@ -6,13 +6,16 @@ services:
     container_name: proxy
     ports:
       - target: 80
-        published: 8080
+        published: 80
+      - target: 443
+        published: 443
       - target: 8080
-        published: 8081
+        published: 8080
       - target: 8081
-        published: 8082
+        published: 8081
     volumes:
       - "../proxy:/etc/nginx/templates"
+      - "./ssl:/etc/nginx/ssl:ro"
     environment:
       BACK_PROXY_PASS: ${BACK_PROXY_PASS:-http://backend:4000}
       FRONT_PROXY_PASS: ${FRONT_PROXY_PASS:-http://frontend:3000}
