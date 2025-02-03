@@ -103,3 +103,4 @@ services:
       service: proxy
     volumes:
       - /etc/nginx/ssl:/etc/nginx/ssl:ro
+      - ./proxy:/etc/nginx/templates

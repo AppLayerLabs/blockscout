@@ -7,8 +7,11 @@ services:
       - "8080:80"   # Host port 8080 maps to container port 80
       - "8443:443"  # Host port 8443 maps to container port 443
     volumes:
-      - ./proxy:/etc/nginx/templates
-      - /etc/nginx/ssl:/etc/nginx/ssl:ro
+      - ./proxy/default.conf.template:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
     environment:
       - BACK_PROXY_PASS=http://backend:4000
       - FRONT_PROXY_PASS=http://frontend:3000
+    depends_on:
+      - frontend
+      - backend
