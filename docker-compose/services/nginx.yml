@@ -2,13 +2,28 @@ version: '3.9'
 
 services:
   proxy:
-    image: nginx:latest
+    image: nginx
+    container_name: proxy
     ports:
-      - "8080:80"   # Host port 8080 maps to container port 80
-      - "8443:443"  # Host port 8443 maps to container port 443
+      - target: 80
+        published: 80
+      - target: 8080
+        published: 8080
+      - target: 8081
+        published: 8081
+      - target: 443
+        published: 443  # Keeping SSL port
     volumes:
-      - ./proxy/default.conf.template
+      - "../proxy:/etc/nginx/templates"
       - ./ssl:/etc/nginx/ssl:ro
     environment:
-      - BACK_PROXY_PASS=http://backend:4000
-      - FRONT_PROXY_PASS=http://frontend:3000
+      BACK_PROXY_PASS: ${BACK_PROXY_PASS:-http://backend:4000}
+      FRONT_PROXY_PASS: ${FRONT_PROXY_PASS:-http://frontend:3000}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
