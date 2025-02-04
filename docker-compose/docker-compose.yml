@@ -41,10 +41,6 @@ services:
     pull_policy: never
     links:
       - db:database
-    environment:
-        ETHEREUM_JSONRPC_HTTP_URL: http://127.0.0.1:8090/ 
-        ETHEREUM_JSONRPC_TRACE_URL: http://127.0.0.1:8090/ 
-        CHAIN_ID: '75338'
 
   visualizer:
     extends:
