@@ -42,9 +42,8 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_HTTP_URL: https://testnet-api.applayer.com/
-        ETHEREUM_JSONRPC_TRACE_URL: https://testnet-api.applayer.com/
-        ETHEREUM_JSONRPC_WS_URL: wss://testnet-api.applayer.com/
+        ETHEREUM_JSONRPC_HTTP_URL: http://127.0.0.1:8090/ 
+        ETHEREUM_JSONRPC_TRACE_URL: http://127.0.0.1:8090/ 
         CHAIN_ID: '75338'
 
   visualizer:
