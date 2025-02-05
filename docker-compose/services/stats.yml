@@ -19,9 +19,9 @@ services:
     container_name: 'stats-db'
     command: postgres -c 'max_connections=200'
     environment:
-        POSTGRES_DB: 'stats'
-        POSTGRES_USER: 'stats'
-        POSTGRES_PASSWORD: 'n0uejXPl61ci6ldCuE2gQU5Y'
+      POSTGRES_DB: 'stats'
+      POSTGRES_USER: 'stats'
+      POSTGRES_PASSWORD: 'n0uejXPl61ci6ldCuE2gQU5Y'
     ports:
       - target: 5432
         published: 7433
@@ -50,4 +50,4 @@ services:
       - STATS__CREATE_DATABASE=${STATS__CREATE_DATABASE:-true}
       - STATS__RUN_MIGRATIONS=${STATS__RUN_MIGRATIONS:-true}
     ports:
-      - "8050:8050"  # Add this line to expose port 8050 to the host
+      - "8050:8050"  # Expose stats API port

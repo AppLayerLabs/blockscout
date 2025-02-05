@@ -3,17 +3,15 @@ version: '3.9'
 services:
   user-ops-indexer:
     image: ghcr.io/blockscout/user-ops-indexer:v1.2.2
-    pull_policy: always
-    platform: linux/amd64
+    network_mode: host         # Use host networking so that 127.0.0.1 is the host
     restart: always
     container_name: 'user-ops-indexer'
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    # extra_hosts not required with host networking
     env_file:
-      -  ../envs/common-user-ops-indexer.env
+      - ../envs/common-user-ops-indexer.env
     environment:
-      - USER_OPS_INDEXER__INDEXER__RPC_URL=${USER_OPS_INDEXER__INDEXER__RPC_URL:-http://host.docker.internal:8090}
-      - USER_OPS_INDEXER__DATABASE__CONNECT__URL=${USER_OPS_INDEXER__DATABASE__CONNECT__URL:-postgresql://blockscout:ceWb1MeLBEeOIfk65gU8EjF8@db:5432/blockscout}
+      - USER_OPS_INDEXER__INDEXER__RPC_URL=${USER_OPS_INDEXER__INDEXER__RPC_URL:-http://127.0.0.1:8090}
+      - USER_OPS_INDEXER__DATABASE__CONNECT__URL=${USER_OPS_INDEXER__DATABASE__CONNECT__URL:-postgresql://blockscout:ceWb1MeLBEeOIfk65gU8EjF8@127.0.0.1:7432/blockscout}
       - USER_OPS_INDEXER__DATABASE__RUN_MIGRATIONS=true
       - USER_OPS_INDEXER__SERVER__HTTP__ADDR=0.0.0.0:8050
       - USER_OPS_INDEXER__SERVER__HTTP__ENABLED=true
