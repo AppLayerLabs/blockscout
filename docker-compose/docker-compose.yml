@@ -39,8 +39,6 @@ services:
         # ADMIN_PANEL_ENABLED: ""
         RELEASE_VERSION: 6.8.0
     pull_policy: never
-    links:
-      - db:database
 
   visualizer:
     extends:
