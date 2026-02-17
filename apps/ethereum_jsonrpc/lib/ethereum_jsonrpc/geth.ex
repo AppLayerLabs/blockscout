@@ -406,6 +406,8 @@ defmodule EthereumJSONRPC.Geth do
     {:error, annotated_error}
   end
 
+  def prepare_calls(nil), do: []
+
   def prepare_calls(calls) do
     case Application.get_env(:ethereum_jsonrpc, __MODULE__)[:tracer] do
       "call_tracer" -> {calls, 0} |> parse_call_tracer_calls([], [], false) |> Enum.reverse()
@@ -415,6 +417,7 @@ defmodule EthereumJSONRPC.Geth do
 
   defp parse_call_tracer_calls(calls, acc, trace_address, inner? \\ true)
   defp parse_call_tracer_calls([], acc, _trace_address, _inner?), do: acc
+  defp parse_call_tracer_calls({nil, _}, acc, _trace_address, _inner?), do: acc
   defp parse_call_tracer_calls({%{"type" => 0}, _}, acc, _trace_address, _inner?), do: acc
 
   defp parse_call_tracer_calls({%{"type" => type}, _}, [last | acc], _trace_address, _inner?)
