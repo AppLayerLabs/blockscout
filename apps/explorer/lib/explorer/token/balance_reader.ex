@@ -49,14 +49,14 @@ defmodule Explorer.Token.BalanceReader do
 
       params_list
       |> Enum.filter(fn
-        %{block_quantity: "latest"} ->
+        %{block_number: block_number} when is_integer(block_number) ->
+          block_number > max_block_number - window
+
+        %{block_number: _} ->
           true
 
-        %{block_quantity: block_quantity} ->
-          EthereumJSONRPC.quantity_to_integer(block_quantity) > max_block_number - window
-
         _ ->
-          Logger.warn("requesting token balance request data when it shouldnt")
+          Logger.warning("requesting token balance request data when it shouldn't")
           false
       end)
     else
